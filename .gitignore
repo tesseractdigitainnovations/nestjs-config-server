@@ -1,0 +1,24 @@
+# Ignore build and dependency directories
+dist/
+node_modules/
+
+# Ignore environment variable files
+.env
+.env.local
+.env.*.local
+
+# Ignore log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Ignore IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+
+
+*.log
+
+pnpm-lock.yaml
