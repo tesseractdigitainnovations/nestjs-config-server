@@ -69,7 +69,17 @@ A centralized configuration server built with NestJS. Supports serving config fi
 
 ## Example Config File
 
-Place JSON config files in the config directory (e.g., `./configs/auth-service-dev.json`):
+- Include some example configs to showcase it working
+
+```sh
+curl http://localhost:3333/config/serviceB/staging
+```
+
+```sh
+curl http://localhost:3333/config/myapp/dev
+```
+
+- Place JSON config files in the config directory (e.g., `./configs/auth-service-dev.json`):
 
 ```json
 {

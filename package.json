@@ -4,6 +4,7 @@
   "description": "NestJS Config Server (file + git backend with hot reload)",
   "scripts": {
     "start": "nest start",
+    "build": "nest build",
     "start:dev": "nest start --watch"
   },
   "dependencies": {
