@@ -13,6 +13,7 @@ A centralized configuration server built with NestJS. Supports serving config fi
 ## How It Works
 
 - Configs are stored as JSON files in a directory (default: `./configs`).
+- supports json/yaml/.env etc.
 - If `CONFIG_SOURCE=git`, the server clones/pulls a Git repo to fetch configs.
 - File changes are watched and configs are reloaded automatically.
 - Endpoints are protected with basic auth if enabled via environment variables.
