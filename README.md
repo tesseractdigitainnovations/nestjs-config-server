@@ -29,7 +29,7 @@ A centralized configuration server built with NestJS. Supports serving config fi
 
 <img width="1557" height="382" alt="config-sever" src="https://github.com/user-attachments/assets/ae672048-3696-4b92-9350-2bcc26500fad" />
 
-## Example Config File
+### Example Config File
 
 - Included some example configs to showcase it working
 
