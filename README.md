@@ -27,6 +27,9 @@ A centralized configuration server built with NestJS. Supports serving config fi
 - Returns the config for the specified app and profile.
 - Example: `GET /config/auth-service/dev`
 
+<img width="1557" height="382" alt="config-sever" src="https://github.com/user-attachments/assets/ae672048-3696-4b92-9350-2bcc26500fad" />
+
+
 ### Refresh Configs from Git
 
 `POST /config/refresh`
