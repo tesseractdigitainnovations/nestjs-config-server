@@ -29,6 +29,27 @@ A centralized configuration server built with NestJS. Supports serving config fi
 
 <img width="1557" height="382" alt="config-sever" src="https://github.com/user-attachments/assets/ae672048-3696-4b92-9350-2bcc26500fad" />
 
+## Example Config File
+
+- Included some example configs to showcase it working
+
+```sh
+curl http://localhost:3333/config/serviceB/staging
+```
+
+```sh
+curl http://localhost:3333/config/myapp/dev
+```
+
+- Place JSON config files in the config directory (e.g., `./configs/auth-service-dev.json`):
+
+```json
+{
+  "jwtSecret": "supersecret",
+  "expiresIn": 3600
+}
+```
+
 
 ### Refresh Configs from Git
 
@@ -70,27 +91,6 @@ A centralized configuration server built with NestJS. Supports serving config fi
  ```sh
  pnpm start:dev
  ```
-
-## Example Config File
-
-- Include some example configs to showcase it working
-
-```sh
-curl http://localhost:3333/config/serviceB/staging
-```
-
-```sh
-curl http://localhost:3333/config/myapp/dev
-```
-
-- Place JSON config files in the config directory (e.g., `./configs/auth-service-dev.json`):
-
-```json
-{
-  "jwtSecret": "supersecret",
-  "expiresIn": 3600
-}
-```
 
 ## Project Structure
 
