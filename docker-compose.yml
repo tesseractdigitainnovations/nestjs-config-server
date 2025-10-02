@@ -14,7 +14,4 @@ services:
       - NODE_ENV=production
     env_file:
       - .env.production 
-    networks:
-      - proxy
-      - meet-to-meat-network
     restart: unless-stopped
