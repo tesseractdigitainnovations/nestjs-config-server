@@ -3,34 +3,58 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 @Injectable()
 export class AuthGuard implements CanActivate {
   
-  // add bool to disable authentication if no creds provided
   private readonly authEnabled = process.env.AUTH_ENABLED === 'true';
-  private readonly user = process.env.CONFIG_AUTH_USER;
-  private readonly pass = process.env.CONFIG_AUTH_PASS;
+  private readonly user = process.env.AUTH_USERNAME;
+  private readonly pass = process.env.AUTH_PASSWORD;
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     
-    // Auth disabled if no creds provided
+    console.log('AuthGuard Debug:', {
+      AUTH_ENABLED: process.env.AUTH_ENABLED,
+      authEnabled: this.authEnabled,
+      user: this.user ? '***set***' : 'not set',
+      pass: this.pass ? '***set***' : 'not set'
+    });
+    
+    // Auth disabled if AUTH_ENABLED is not 'true'
     if (!this.authEnabled) {
+      console.log('AuthGuard: Authentication is DISABLED, allowing request');
       return true;
+    }
+
+    console.log('AuthGuard: Authentication is ENABLED, validating request...');
+
+    // If auth is enabled but credentials are not configured, throw error
+    if (!this.user || !this.pass) {
+      throw new UnauthorizedException('Authentication is enabled but credentials are not configured');
     }
 
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers['authorization'];
 
     if (!authHeader || !authHeader.startsWith('Basic ')) {
-      throw new UnauthorizedException('Missing Authorization header');
+      throw new UnauthorizedException('Missing or invalid Authorization header');
     }
 
-    const base64Credentials = authHeader.split(' ')[1];
-    const [username, password] = Buffer.from(base64Credentials, 'base64')
-      .toString('utf-8')
-      .split(':');
+    try {
+      const base64Credentials = authHeader.split(' ')[1];
+      const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+      const [username, password] = credentials.split(':');
 
-    if (username === this.user && password === this.pass) {
-      return true;
+      if (!username || !password) {
+        throw new UnauthorizedException('Invalid credentials format');
+      }
+
+      if (username === this.user && password === this.pass) {
+        return true;
+      }
+
+      throw new UnauthorizedException('Invalid credentials');
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Invalid Authorization header format');
     }
-
-    throw new UnauthorizedException('Invalid credentials');
   }
 }

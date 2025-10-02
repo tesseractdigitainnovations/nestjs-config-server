@@ -50,7 +50,6 @@ curl http://localhost:3333/config/myapp/dev
 }
 ```
 
-
 ### Refresh Configs from Git
 
 `POST /config/refresh`
@@ -66,8 +65,8 @@ curl http://localhost:3333/config/myapp/dev
 | CONFIG_GIT_REPO      | Git repo URL (if using git source)               | (none)          |
 | CONFIG_GIT_BRANCH    | Branch to use for git source                     | main            |
 | AUTH_ENABLED         | Enable basic auth (`true`/`false`)               | false           |
-| CONFIG_AUTH_USER     | Username for basic auth                          | (none)          |
-| CONFIG_AUTH_PASS     | Password for basic auth                          | (none)          |
+| AUTH_USER            | Username for basic auth                          | (none)          |
+| AUTH_PASS            | Password for basic auth                          | (none)          |
 | PORT                 | Port to run the server                           | 3333            |
 
 ## Usage
