@@ -1,4 +1,4 @@
-import { Controller, Get, Param, NotFoundException, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards, PreconditionFailedException, UnprocessableEntityException } from '@nestjs/common';
 import { AppConfigService } from './config.service';
 import { AuthGuard } from './auth.guard';
 
@@ -12,7 +12,7 @@ export class ConfigController {
   async getConfig(@Param('app') app: string, @Param('profile') profile: string) {
     const config = await this.configService.getConfig(app, profile);
     if (!config) {
-      throw new NotFoundException(`Config for ${app}-${profile} not found`);
+      throw new UnprocessableEntityException(`Config for ${app}-${profile} not found`);
     }
     return config;
   }
@@ -20,6 +20,13 @@ export class ConfigController {
   // Perform a manual/hard refresh of configs from Git
   @Post('refresh')
   async refreshConfig() {
+
+    const isGitEnabled = this.configService.isGitEnabled();
+
+    if (!isGitEnabled) {
+      throw new PreconditionFailedException('Git integration is not enabled'); 
+    }
+
     await this.configService.refreshFromGit();
     return { status: 'OK', message: 'Configs refreshed from Git' };
   }

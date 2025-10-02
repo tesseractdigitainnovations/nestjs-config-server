@@ -18,6 +18,17 @@ export class AppConfigService implements OnModuleInit {
   private git: SimpleGit | null = null;
   private cache: Record<string, any> = {};
 
+
+  isGitEnabled(): boolean {
+    return this.source === 'git';
+  }
+
+  constructor() {
+    if (!fs.existsSync(this.configDir)) {
+      fs.mkdirSync(this.configDir, { recursive: true });
+    }
+  }
+  
   async onModuleInit() {
     if (this.source === 'git') {
       await this.initGitRepo();

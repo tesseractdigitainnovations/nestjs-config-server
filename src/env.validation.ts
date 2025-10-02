@@ -4,6 +4,7 @@ import * as Joi from 'joi';
 export const envSchema = Joi.object({
   CONFIG_SOURCE: Joi.string().valid('file', 'git').default('file'),
   CONFIG_DIR: Joi.string().default('./configs'),
+  PORT: Joi.number().default(3333),
   CONFIG_GIT_REPO: Joi.string().when('CONFIG_SOURCE', {
     is: 'git',
     then: Joi.required(),

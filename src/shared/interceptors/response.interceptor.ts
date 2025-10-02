@@ -39,6 +39,7 @@ export class ResponseInterceptor implements NestInterceptor {
       return oldJson.call(response, {
         statusCode,
         timeStamp,
+        success: statusCode >= 200 && statusCode < 400, // false on 400s and 500s
         requestId,
         data: body,
       });

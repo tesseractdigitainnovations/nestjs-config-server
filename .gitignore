@@ -4,7 +4,9 @@ node_modules/
 
 # Ignore environment variable files
 .env
-.env.local
+.env.dev*
+.env.prod*
+.env.test*
 .env.*.local
 
 # Ignore log files
@@ -20,5 +22,7 @@ yarn-error.log*
 
 
 *.log
+logs/*.log.*
+/logs/
 
 pnpm-lock.yaml
