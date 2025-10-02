@@ -11,7 +11,7 @@ export const envSchema = Joi.object({
     otherwise: Joi.optional().allow(''),
   }),
   CONFIG_GIT_BRANCH: Joi.string().default('main'),
-  CONFIG_AUTH_USER: Joi.string().optional().allow(''),
-  CONFIG_AUTH_PASS: Joi.string().optional().allow(''),
+  AUTH_USER: Joi.string().optional().allow(''),
+  AUTH_PASS: Joi.string().optional().allow(''),
   AUTH_ENABLED: Joi.string().valid('true', 'false').default('false'),
 }).unknown(true); // allow other env vars

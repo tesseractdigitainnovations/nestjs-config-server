@@ -11,8 +11,10 @@ async function bootstrap() {
 
   // Load .env file based on NODE_ENV
   const env = process.env.NODE_ENV || 'development';
-  const envFile = env === 'development' ? '.env' : `.env.${env}`;
+  const envFile = `.env.${env}`;
   dotenv.config({ path: envFile });
+  
+  console.log(`Loading environment from: ${envFile}`);
 
   // log startup message
   console.log('Starting application...');
