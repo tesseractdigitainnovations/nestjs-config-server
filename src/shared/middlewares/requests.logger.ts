@@ -1,55 +1,75 @@
 // requests.logger.ts for file based logging in json format
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import * as fs from 'fs';
-import * as path from 'path';
+import { Injectable, NestMiddleware, Logger } from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
+import * as fs from "fs";
+import * as path from "path";
 
 @Injectable()
 export class RequestsLoggerMiddleware implements NestMiddleware {
+  private static readonly logger = new Logger(RequestsLoggerMiddleware.name);
 
-  // Ensure logs directory exists relative to process working directory (Docker-ready)
+  /**
+   * Directory where request logs are written.
+   *
+   * Defaults to "./logs" for local development.
+   * In Kubernetes set:
+   *
+   * LOG_DIR=/tmp/logs
+   */
+  private static readonly logDir =
+    process.env.LOG_DIR || path.join(process.cwd(), "logs");
+
   constructor() {
-    const logDir = path.join(process.cwd(), 'logs');
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir, { recursive: true });
+    try {
+      fs.mkdirSync(RequestsLoggerMiddleware.logDir, {
+        recursive: true,
+      });
+    } catch (err) {
+      RequestsLoggerMiddleware.logger.error(
+        `Failed to create log directory: ${RequestsLoggerMiddleware.logDir}`,
+        err instanceof Error ? err.stack : String(err),
+      );
     }
   }
 
-  // Static method to get log file path based on current date (Docker-ready)
   private static getLogFilePath(): string {
-    const date = new Date();
-    const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
-    return path.join(process.cwd(), 'logs', `requests-${dateStr}.log`);
+    const date = new Date().toISOString().split("T")[0];
+    return path.join(RequestsLoggerMiddleware.logDir, `requests-${date}.log`);
   }
 
-  use(req: Request, res: Response, next: NextFunction) {
+  use(req: Request, res: Response, next: NextFunction): void {
     const start = Date.now();
-    
-    res.on('finish', () => {
-      const duration = Date.now() - start;
+
+    res.on("finish", () => {
       const logEntry = {
         timestamp: new Date().toISOString(),
         method: req.method,
         url: req.originalUrl,
         status: res.statusCode,
-        duration,
-        userAgent: req.headers['user-agent'] || '',
+        duration: Date.now() - start,
+        userAgent: req.headers["user-agent"] ?? "",
+        svcName: req.headers["x-svc-name"] ?? "unknown",
+        hostName: req.headers["x-host-name"] ?? "unknown",
         ip: req.ip,
       };
-      
-      const logFilePath = RequestsLoggerMiddleware.getLogFilePath();
-      fs.appendFile(logFilePath, JSON.stringify(logEntry) + '\n', (err) => {
-        if (err) {
-          console.error('Failed to write request log:', err);
-        }
 
-      console.log('Request logged:', logEntry, 'file:', logFilePath);
-      });
+      const json = JSON.stringify(logEntry);
+      RequestsLoggerMiddleware.logger.log(json);
+
+      fs.appendFile(
+        RequestsLoggerMiddleware.getLogFilePath(),
+        json + "\n",
+        (err) => {
+          if (err) {
+            RequestsLoggerMiddleware.logger.error(
+              "Failed to write request log",
+              err.stack,
+            );
+          }
+        },
+      );
     });
+
     next();
   }
 }
-// To use this middleware, import and apply it in your main.ts or app.module.ts / wherever you set up your NestJS application.
-// Example in main.ts:
-// import { RequestsLoggerMiddleware } from './middlewares/requests.logger';
-// app.use(new RequestsLoggerMiddleware().use);
