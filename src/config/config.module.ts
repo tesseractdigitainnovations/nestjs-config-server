@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { AppConfigService } from './config.service';
-import { ConfigController } from './config.controller';
-import { AuthGuard } from './auth.guard';
+import { Module } from "@nestjs/common";
+import { AppConfigService } from "./config.service";
+import { ConfigController } from "./config.controller";
+import { AuthGuard } from "../shared/guards/auth.guard";
 
 @Module({
   controllers: [ConfigController],
