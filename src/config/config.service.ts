@@ -6,6 +6,11 @@ import simpleGit, { SimpleGit } from 'simple-git';
 import * as YAML from 'yaml';
 import * as dotenv from 'dotenv';
 import PropertiesReader from 'properties-reader';
+import {
+  decryptDocument,
+  parseEncryptionKey,
+  type ConfigDocument,
+} from './crypto';
 
 @Injectable()
 export class AppConfigService implements OnModuleInit {
@@ -17,6 +22,10 @@ export class AppConfigService implements OnModuleInit {
 
   private git: SimpleGit | null = null;
   private cache: Record<string, any> = {};
+  // null when CONFIG_ENCRYPTION_KEY is unset: documents are then served as-is.
+  private readonly encryptionKey: Buffer | null = parseEncryptionKey(
+    process.env.CONFIG_ENCRYPTION_KEY,
+  );
 
 
   isGitEnabled(): boolean {
@@ -111,8 +120,11 @@ export class AppConfigService implements OnModuleInit {
 
   async getConfig(app: string, profile: string): Promise<any> {
     const key = `${app}-${profile}`;
-    if (this.cache[key]) return this.cache[key];
-    return this.loadFromFile(app, profile);
+    const doc = this.cache[key] ?? this.loadFromFile(app, profile);
+    if (!doc) return doc;
+    // Decrypt here, not at load time, so the cache and the files on disk keep the
+    // ENC() form and a wrong key surfaces on the request that needs the value.
+    return decryptDocument(doc as ConfigDocument, this.encryptionKey);
   }
 
   async refreshFromGit() {

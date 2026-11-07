@@ -30,6 +30,14 @@ export const envSchema = Joi.object({
   K8S_TOKEN_PATH: Joi.string().optional().allow(""),
   K8S_CA_PATH: Joi.string().optional().allow(""),
 
+  // Encryption at rest. 64 hex chars (32 bytes) for AES-256-GCM; unset means ENC()
+  // values are served verbatim, so set this before encrypting anything.
+  CONFIG_ENCRYPTION_KEY: Joi.string()
+    .hex()
+    .length(64)
+    .optional()
+    .allow(""),
+
   // Log configuration
   LOG_DIR: Joi.string().optional().allow(""),
 }).unknown(true); // allow other env vars
