@@ -37,6 +37,50 @@ A modern, passwordless, **Zero-Trust** authentication architecture. Instead of m
 
 ---
 
+## 🔐 Encryption at Rest
+
+Values can be stored encrypted in the config files and decrypted only when served, so a
+`.env.*` file is safe to keep in git. Format is `ENC(<base64>)`, AES-256-GCM, so a tampered
+value fails to decrypt instead of returning garbage.
+
+Set the key as `CONFIG_ENCRYPTION_KEY` (64 hex characters = 32 bytes):
+
+```bash
+npm run generate-key                    # prints a new key
+```
+
+```yaml
+            - name: CONFIG_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: config-encryption-key
+                  key: master-key
+```
+
+Then encrypt the values you want hidden:
+
+```bash
+npm run encrypt -- --file configs/my-app/.env.production --key-file ./master.key
+npm run decrypt -- --file configs/my-app/.env.production --key-file ./master.key
+npm run rekey   -- --file configs/my-app/.env.production \
+                   --old-key-file ./old.key --new-key-file ./new.key
+```
+
+`encrypt` asks before each value and matches key names against a pattern
+(`PASSWORD|SECRET|KEY|TOKEN|JWT|DSN|...` by default, override with `--pattern`), so
+non-secrets like `JWT_ACCESS_TOKEN_EXPIRY=1d` are not encrypted by accident. It is
+idempotent - an already-encrypted value is skipped.
+
+Two things that will bite you:
+
+- **Enable the key before encrypting.** With no key the server passes documents through
+  untouched, so encrypting first makes it serve the literal `ENC(...)` strings as values
+  and every client gets a broken password.
+- **Back the key up off the cluster.** Lose it and every encrypted value is unrecoverable;
+  there is no escrow. `rekey` is the rotation path.
+
+Unencrypted values are served as-is, so adoption can be incremental.
+
 ## 🛠️ Step-by-Step Kubernetes Deployment & Setup Guide
 
 Deploying the Config Server under `k8s-token` mode involves setting up the server's RBAC permissions, and configuring the client pods to project their ServiceAccount tokens.
