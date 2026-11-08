@@ -46,7 +46,7 @@ value fails to decrypt instead of returning garbage.
 Set the key as `CONFIG_ENCRYPTION_KEY` (64 hex characters = 32 bytes):
 
 ```bash
-npm run generate-key                    # prints a new key
+pnpm generate-key                       # prints a new key
 ```
 
 ```yaml
@@ -60,9 +60,9 @@ npm run generate-key                    # prints a new key
 Then encrypt the values you want hidden:
 
 ```bash
-npm run encrypt -- --file configs/my-app/.env.production --key-file ./master.key
-npm run decrypt -- --file configs/my-app/.env.production --key-file ./master.key
-npm run rekey   -- --file configs/my-app/.env.production \
+pnpm encrypt --file configs/my-app/.env.production --key-file ./master.key
+pnpm decrypt --file configs/my-app/.env.production --key-file ./master.key
+pnpm rekey   --file configs/my-app/.env.production \
                    --old-key-file ./old.key --new-key-file ./new.key
 ```
 
